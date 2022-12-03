@@ -87,4 +87,4 @@ apiV1Route.use('/deletePicture', deletePicture);
 apiV1Route.use('/getHistory/', getHistory);
 apiV1Route.use('/updateSeqNumbers/', updateSeqNumbers);
 
-export default apiV1Route
+module.exports = apiV1Route
