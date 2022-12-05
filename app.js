@@ -25,11 +25,11 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, 'public2')));
-app.use('/static', express.static(__dirname + '/public2'));
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'public2', 'index.html'));
-});
+// app.use(express.static(path.join(__dirname, 'public2')));
+// app.use('/static', express.static(__dirname + '/public2'));
+// app.get('/', function (req, res) {
+//   res.sendFile(path.join(__dirname, 'public2', 'index.html'));
+// });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/static', express.static(__dirname + '/public'));

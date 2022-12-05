@@ -1,9 +1,12 @@
 const { sendStatusData } = require('../utils/sendStatusData');
 const dbGetPictureService = require('../services/dbNewProjectService');
+const __dir = require('path').dirname(require.main.filename)
 const fs = require('fs');
 
+
+
 module.exports = {
-  async downloadPicture(req, res) {
+  async downloadPictureLinks(req, res) {
     try {
       const [dbName, id, type] = req.params.dbName.split(',');
 
@@ -18,4 +21,34 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  async downloadPicture(req, res) {
+
+    try {
+      const [dbName, link] = req.params.dbName.split(',');
+      console.log('link',link);
+      const path = __dir+'/public'+ link;
+      console.log('__dirname',__dir);
+      if (fs.existsSync(path)){
+        console.log('file exits sending');
+        res.sendFile(path);
+        //return sendStatusData(200);
+      } else {
+        return sendStatusData(res, 200, 'no pictures');
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
 };
+
+
+//  async check file exists
+
+// fs.access(path, fs.F_OK, (err) => {
+//   if (err) {
+//     console.error(err)
+//     return
+//   }
+//
+//   //file exists
+// })
