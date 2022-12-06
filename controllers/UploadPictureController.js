@@ -17,16 +17,17 @@ module.exports = {
         const userId = req.headers.userid;
         const userName = req.headers.username;
 
-        let dir = './public/uploadedPictures/';
+        // let dir = './public/uploadedPictures/';
+        let dir = '/root/uploadedPictures/';
         if (!fs.existsSync(dir)) {
           await fs.mkdirSync(dir);
         }
-        dir = './public/uploadedPictures/' + dbName + '/';
+        dir = '/root/uploadedPictures/' + dbName + '/';
         if (!fs.existsSync(dir)) {
           await fs.mkdirSync(dir);
         }
 
-        dir = './public/uploadedPictures/' + dbName + '/' + (itemType + itemId) + '/';
+        dir = '/root/uploadedPictures/' + dbName + '/' + (itemType + itemId) + '/';
         if (!fs.existsSync(dir)) {
           await fs.mkdirSync(dir);
         }
