@@ -59,6 +59,36 @@ module.exports = {
     const res = DataBases(sql, []);
     return res;
   },
+
+  addDocument(dir, userId, dbName, userName, fileName) {
+    let sql =
+        'CREATE TABLE IF NOT EXISTS ' +
+        dbName +
+        '.documents' +
+        ' ( id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,' +
+        ' dir VARCHAR(200)  DEFAULT "none" ,' +
+        ' user_id VARCHAR(30)  DEFAULT "none" ,' +
+        ' date DATETIME DEFAULT CURRENT_TIMESTAMP ,' +
+        ' file_name VARCHAR(100)  DEFAULT "none" ,' +
+        ' user_name VARCHAR(100)  DEFAULT "none" );';
+
+
+    const res1 = DataBases(sql, []);
+    sql = 'INSERT INTO ' + dbName + '.documents ( dir, user_id, user_name, file_name ) VALUES ( "' + dir + '", "' + userId + '", "' + userName + '", "' + fileName + '" ) ;';
+    const res = DataBases(sql, []);
+    return res;
+  },
+  getDocument(dbName) {
+    let sql = 'SELECT * FROM ' + dbName + '.documents ;';
+    const res = DataBases(sql, []);
+    return res;
+  },
+  deleteDocument(dbName, file_id) {
+    let sql = 'DELETE FROM ' + dbName + '.documents WHERE id =' + file_id +';';
+
+    const res = DataBases(sql, []);
+    return res;
+  },
 };
 
 const databaseString1 =

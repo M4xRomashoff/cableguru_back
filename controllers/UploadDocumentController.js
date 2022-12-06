@@ -1,9 +1,9 @@
 const { sendStatusData } = require('../utils/sendStatusData');
-const dbAddPictureService = require('../services/dbNewProjectService');
+const dbAddDocumentService = require('../services/dbNewProjectService');
 const fs = require('fs');
 
 module.exports = {
-  async uploadPicture(req, res) {
+  async uploadDocument(req, res) {
     try {
       if (!req.files) {
         res.send({
@@ -12,30 +12,24 @@ module.exports = {
         });
       } else {
         const dbName = req.headers.dbname;
-        const itemType = req.headers.itemtype + '_';
-        const itemId = req.headers.itemid;
         const userId = req.headers.userid;
         const userName = req.headers.username;
 
-        let dir = './public/uploadedPictures/';
+        let dir = './public/uploadedDocuments/';
 
         if (!fs.existsSync(dir)) {
           await fs.mkdirSync(dir);
         }
-        dir = './public/uploadedPictures/' + dbName + '/';
+        dir = './public/uploadedDocuments/' + dbName + '/';
         if (!fs.existsSync(dir)) {
           await fs.mkdirSync(dir);
         }
 
-        dir = './public/uploadedPictures/' + dbName + '/' + (itemType + itemId) + '/';
-        if (!fs.existsSync(dir)) {
-          await fs.mkdirSync(dir);
-        }
         let avatar = req.files.file;
         let fileName = req.body.title;
         await avatar.mv(dir + fileName);
 
-        const result = await dbAddPictureService.addPicture((dir + fileName).slice(8), userId, dbName, itemType.slice(0, 2), itemId, userName);
+        const result = await dbAddDocumentService.addDocument((dir + fileName).slice(8), userId, dbName, userName, fileName);
         if (result?.warningStatus === 0 || result === 'ok') return sendStatusData(res, 200);
         return sendStatusData(res, 501, result);
       }

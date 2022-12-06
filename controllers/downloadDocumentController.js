@@ -1,37 +1,37 @@
 const { sendStatusData } = require('../utils/sendStatusData');
-const dbGetPictureService = require('../services/dbNewProjectService');
+const dbGetDocumentService = require('../services/dbNewProjectService');
 const __dir = require('path').dirname(require.main.filename)
 const fs = require('fs');
 
 
 
 module.exports = {
-  async downloadPictureLinks(req, res) {
+  async downloadDocumentLinks(req, res) {
     try {
-      const [dbName, id, type] = req.params.dbName.split(',');
+      const dbName = req.params.dbName;
 
-      if (dbName !== '' && parseInt(id) > 0 && (type === 'sp' || type === 'tp')) {
-        const result = await dbGetPictureService.getPicture(dbName, id, type);
+      if (dbName !== '') {
+        const result = await dbGetDocumentService.getDocument(dbName);
         if (result.length > 0) return sendStatusData(res, 200, result);
         return sendStatusData(res, 501);
       } else {
-        return sendStatusData(res, 200, 'no pictures');
+        return sendStatusData(res, 200, 'no documents');
       }
     } catch (err) {
       res.status(500).send(err);
     }
   },
-  async downloadPicture(req, res) {
+
+  async downloadDocument(req, res) {
 
     try {
-      const [dbName, link] = req.params.dbName.split(',');
+      const [link] = req.params.link;
 
       const path = __dir+'/public'+ link;
       if (fs.existsSync(path)){
         res.sendFile(path);
-        //return sendStatusData(200);
       } else {
-        return sendStatusData(res, 200, 'no pictures');
+        return sendStatusData(res, 200, 'no document');
       }
     } catch (err) {
       res.status(500).send(err);

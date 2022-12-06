@@ -37,6 +37,11 @@ const dbUpdateProjectOptions = require('./setProjectOptions');
 const UploadPicture = require('./uploadPicture');
 const downloadPicture = require('./downloadPicture');
 const deletePicture = require('./deletePicture');
+
+const UploadDocument = require('./uploadDocument');
+const downloadDocument = require('./downloadDocument');
+const deleteDocument = require('./deleteDocument');
+
 const getHistory = require('./getHistory');
 const updateSeqNumbers = require('./updateSeqNumbers');
 
@@ -84,6 +89,9 @@ apiV1Route.use('/updateProjectOptions', dbUpdateProjectOptions);
 apiV1Route.use('/uploadPicture', UploadPicture);
 apiV1Route.use('/getPicture', downloadPicture);
 apiV1Route.use('/deletePicture', deletePicture);
+apiV1Route.use('/uploadDocument', UploadDocument);
+apiV1Route.use('/getDocument', downloadDocument);
+apiV1Route.use('/deleteDocument', deleteDocument);
 apiV1Route.use('/getHistory/', getHistory);
 apiV1Route.use('/updateSeqNumbers/', updateSeqNumbers);
 
