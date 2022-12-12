@@ -2,40 +2,40 @@ const { sendStatusData } = require('../utils/sendStatusData');
 const dbSpFcsService = require('../services/dbSpFcsService');
 const { getCablePointsFromString } = require('../utils/getCablePointsFromStringServer');
 
-function getDirectionByTwoPoints(startPoint, endPoint) {
+function getDirectionByTwoPoints(lang, startPoint, endPoint) {
   let direction = 'unknown';
   const x1 = startPoint.lat - endPoint.lat;
   const x2 = startPoint.lng - endPoint.lng;
   const z = Math.atan2(x1, x2);
-  if (z > -0.3 && z <= 0.3) direction = 'West ';
-  if (z > 0.3 && z <= 1.32) direction = ' South-West ';
-  if (z > 1.32 && z <= 1.8) direction = ' South ';
-  if (z > 1.8 && z <= 2.85) direction = ' South-East ';
-  if ((z > 2.85 && z <= 3.15) || (z < -2.85 && z > -3.15)) direction = ' East ';
-  if (z > -2.85 && z <= -1.8) direction = ' North-East ';
-  if (z > -1.8 && z <= -1.32) direction = ' North ';
-  if (z > -1.32 && z <= -0.3) direction = ' North-West ';
+  if (z > -0.3 && z <= 0.3) {direction = 'West ';if (lang === 'ru')direction = ' Запад' }
+  if (z > 0.3 && z <= 1.32) {direction = ' South-West ';if (lang === 'ru')direction = ' Юго-Запад' }
+  if (z > 1.32 && z <= 1.8) {direction = ' South ';if (lang === 'ru')direction = ' Юг' }
+  if (z > 1.8 && z <= 2.85) {direction = ' South-East ';if (lang === 'ru')direction = ' Юго-Восток' }
+  if ((z > 2.85 && z <= 3.15) || (z < -2.85 && z > -3.15)) {direction = ' East ';if (lang === 'ru')direction = ' Восток' }
+  if (z > -2.85 && z <= -1.8) {direction = ' North-East ';if (lang === 'ru')direction = ' Северо-Восток' }
+  if (z > -1.8 && z <= -1.32) {direction = ' North ';if (lang === 'ru')direction = ' Север' }
+  if (z > -1.32 && z <= -0.3) {direction = ' North-West ';if (lang === 'ru')direction = ' Северо-Запад' }
   return direction;
 }
 
-function getDirection(cable, item, conType) {
+function getDirection(lang, cable, item, conType) {
   let direction = [];
   const cablePoints = getCablePointsFromString(cable.points);
   const cableLength = cablePoints.length;
 
   if (conType === 'tail') {
     if (item.point === 0) {
-      direction = getDirectionByTwoPoints(cablePoints[0], cablePoints[1]);
+      direction = getDirectionByTwoPoints(lang, cablePoints[0], cablePoints[1]);
     }
     if (item.point > 0) {
-      direction = getDirectionByTwoPoints(cablePoints[cableLength - 1], cablePoints[cableLength - 2]);
+      direction = getDirectionByTwoPoints(lang, cablePoints[cableLength - 1], cablePoints[cableLength - 2]);
     }
   }
   if (conType === 'ringLow') {
-    direction.push(getDirectionByTwoPoints(cablePoints[item.point], cablePoints[item.point - 1]));
+    direction.push(getDirectionByTwoPoints(lang, cablePoints[item.point], cablePoints[item.point - 1]));
   }
   if (conType === 'ringHigh') {
-    direction.push(getDirectionByTwoPoints(cablePoints[item.point], cablePoints[item.point + 1]));
+    direction.push(getDirectionByTwoPoints(lang, cablePoints[item.point], cablePoints[item.point + 1]));
   }
   return direction;
 }
@@ -156,22 +156,36 @@ function combineDataSplices(dataFromConnections, dataFromCables, dataFromSp, dat
   return [finalData, resultData];
 }
 
-function combineData(con, cab) {
-  const data = [];
-  const dataId = ['ID'];
-  const dataSize = ['Size'];
-  const dataType = ['Type'];
-  const dataDirection = ['Direction '];
-  const dataDoB = ['Date of Birth '];
-  const dataMfg = ['Manufacturer '];
-  const dataSeq = ['Sequential # '];
+function combineData(lang,con, cab) {
+
+  let data = [];
+  let dataId = ['ID'];
+  let dataSize = ['Size'];
+  let dataType = ['Type'];
+  let dataDirection = ['Direction '];
+  let dataDoB = ['Date of Birth '];
+  let dataMfg = ['Manufacturer '];
+  let dataSeq = ['Sequential # '];
+
+  if (lang === 'ru'){
+     data = [];
+     dataId = ['#'];
+     dataSize = ['Размер'];
+     dataType = ['Тип'];
+     dataDirection = ['Направление '];
+     dataDoB = ['Дата произв. '];
+     dataMfg = ['Производитель '];
+     dataSeq = ['Метраж '];
+  }
+
   con.map((item) => {
     const cable = cab.find((element) => element.id === item.cab_id);
     if (item.ring.toString('hex') === '00') {
       dataId.push(cable.name_id);
       dataSize.push(cable.capacity);
-      dataType.push('tail');
-      dataDirection.push(getDirection(cable, item, 'tail'));
+      if (lang === 'ru') dataType.push('хвост');
+      else dataType.push('tail');
+      dataDirection.push(getDirection(lang, cable, item, 'tail'));
       dataDoB.push(cable.birthday.toLocaleDateString());
       dataMfg.push(cable.mfg);
       dataSeq.push(item.seq);
@@ -179,8 +193,9 @@ function combineData(con, cab) {
     if (item.ring.toString('hex') === '01') {
       dataId.push(cable.name_id, cable.name_id);
       dataSize.push(cable.capacity, cable.capacity);
-      dataType.push('ring', 'ring');
-      dataDirection.push(getDirection(cable, item, 'ringLow'), getDirection(cable, item, 'ringHigh'));
+      if (lang === 'ru')   dataType.push('кольцо', 'кольцо');
+      else dataType.push('ring', 'ring');
+      dataDirection.push(getDirection(lang, cable, item, 'ringLow'), getDirection(lang, cable, item, 'ringHigh'));
       dataDoB.push(cable.birthday.toLocaleDateString(), cable.birthday.toLocaleDateString());
       dataMfg.push(cable.mfg, cable.mfg);
       dataSeq.push(item.seq, item.seq_h);
@@ -195,12 +210,13 @@ module.exports = {
     const array = req?.params?.dbName.split(',');
     const dbName = array[0];
     const spId = array[1];
+    const lang = array[2];
 
     const dataFromConnections = await dbSpFcsService.getConnections(dbName, spId);
     const cablesId = dataFromConnections.map((c_id) => c_id.cab_id);
     const dataFromCables = await dbSpFcsService.getCables(dbName, cablesId);
     const dataFromSp = await dbSpFcsService.getSp(dbName, spId);
-    const dataHeader = combineData(dataFromConnections, dataFromCables);
+    const dataHeader = combineData(lang,dataFromConnections, dataFromCables);
     const [dataSplices, dataSplicesFull] = combineDataSplices(dataFromConnections, dataFromCables, dataFromSp, dataHeader);
     const data = { header: dataHeader, body: dataSplices, bodyFull: dataSplicesFull };
     return sendStatusData(res, 200, data);
