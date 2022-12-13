@@ -1,20 +1,22 @@
 const { sendStatusData } = require('../utils/sendStatusData');
 const dbSpFcsService = require('../services/dbSpFcsService');
 const { getCablePointsFromString } = require('../utils/getCablePointsFromStringServer');
+const { languages } = require('../utils/languages/languages');
 
 function getDirectionByTwoPoints(lang, startPoint, endPoint) {
   let direction = 'unknown';
+  const languageDirection = languages[lang].direction
   const x1 = startPoint.lat - endPoint.lat;
   const x2 = startPoint.lng - endPoint.lng;
   const z = Math.atan2(x1, x2);
-  if (z > -0.3 && z <= 0.3) {direction = 'West ';if (lang === 'ru')direction = ' Запад' }
-  if (z > 0.3 && z <= 1.32) {direction = ' South-West ';if (lang === 'ru')direction = ' Юго-Запад' }
-  if (z > 1.32 && z <= 1.8) {direction = ' South ';if (lang === 'ru')direction = ' Юг' }
-  if (z > 1.8 && z <= 2.85) {direction = ' South-East ';if (lang === 'ru')direction = ' Юго-Восток' }
-  if ((z > 2.85 && z <= 3.15) || (z < -2.85 && z > -3.15)) {direction = ' East ';if (lang === 'ru')direction = ' Восток' }
-  if (z > -2.85 && z <= -1.8) {direction = ' North-East ';if (lang === 'ru')direction = ' Северо-Восток' }
-  if (z > -1.8 && z <= -1.32) {direction = ' North ';if (lang === 'ru')direction = ' Север' }
-  if (z > -1.32 && z <= -0.3) {direction = ' North-West ';if (lang === 'ru')direction = ' Северо-Запад' }
+  if (z > -0.3 && z <= 0.3) direction = languageDirection.west
+  if (z > 0.3 && z <= 1.32) direction = languageDirection.southWest
+  if (z > 1.32 && z <= 1.8) direction = languageDirection.south
+  if (z > 1.8 && z <= 2.85) direction = languageDirection.southEast
+  if ((z > 2.85 && z <= 3.15) || (z < -2.85 && z > -3.15)) direction = languageDirection.southWest
+  if (z > -2.85 && z <= -1.8) direction = languageDirection.northEast
+  if (z > -1.8 && z <= -1.32) direction = languageDirection.north
+  if (z > -1.32 && z <= -0.3) direction = languageDirection.northWest
   return direction;
 }
 
