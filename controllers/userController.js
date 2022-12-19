@@ -98,12 +98,26 @@ module.exports = {
   },
 
   async addUser(req, res) {
-    const { name, password, password_confirmation, password_hint, phone, company, email, access } = req.body || {};
+    const { name, password, password_hint, phone, company, email, access } = req.body || {};
     const hashedPassword = await hashPassword(password);
     const records = [name, hashedPassword, password_hint, email, phone, company, access];
     const newUser = await userService.addUser(records);
     if (newUser?.insertId) return sendStatusData(res, 200, newUser);
     return sendStatusData(res, 501, newUser);
+  },
+  async updateUser(req, res) {
+    const { name, password, password_hint, phone, company, email, userId} = req.body || {};
+
+    const records = {name:name, email:email, phone:phone, company:company, id:userId};
+    const response = await userService.updateUser(records);
+    if (password !== undefined) {
+      const hashedPassword = await hashPassword(password);
+      const data = {hashedPassword:hashedPassword, password_hint:password_hint,id:userId};
+      const response2 = await userService.updateUserPass(data);
+    }
+
+    if (response?.changedRows === 1) return sendStatusData(res, 200);
+    return sendStatusData(res, 501);
   },
 
   async getUsersDb(req, res) {

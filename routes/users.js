@@ -8,6 +8,7 @@ userRouter.get('/', ensureToken, userController.getAll)
 userRouter.post('/login', userController.login)
 userRouter.post('/refresh-token', ensureToken, userController.refreshToken)
 userRouter.post('/', ensureToken, checkAdmin, userController.addUser);
+userRouter.post('/update', ensureToken, userController.updateUser);
 userRouter.get('/:id/db', ensureToken, userController.getUsersDb);
 userRouter.get('/:id', ensureToken, userController.getUserById);
 userRouter.delete('/:id', ensureToken, checkAdmin, userController.deleteUser);
